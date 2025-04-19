@@ -1,6 +1,0 @@
-# Initialize the package configuration
-include(CMakePackageConfigHelpers)
-
-include("${CMAKE_CURRENT_LIST_DIR}/SimulationFrameworkTargets.cmake")
-
-check_required_components(SimulationFramework)
