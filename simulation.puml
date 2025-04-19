@@ -1,0 +1,103 @@
+@startuml interfaces_and_simulation
+
+skinparam class {
+    BackgroundColor White
+    ArrowColor #0078D7
+    BorderColor #0078D7
+}
+
+skinparam default {
+    FontName Arial
+    FontSize 12
+}
+
+' Enums
+enum Aggregation {
+    Mean
+    Median
+    Min
+    Max
+}
+
+' Interfaces
+interface IAggregator {
+    + {abstract} name(): string
+    + {abstract} aggregate(values: vector<double>): double
+    + {abstract} ~IAggregator()
+}
+
+interface ISimulator<Input, Output> {
+    + {abstract} operator()(input: Input): Output
+    + {abstract} ~ISimulator()
+}
+
+interface IMetric<Output> {
+    + {abstract} name(): string
+    + {abstract} extract(output: Output): double
+    + {abstract} aggregator(): shared_ptr<IAggregator>
+    + {abstract} ~IMetric()
+}
+
+interface IInputGenerator<Input> {
+    + {abstract} generate(size: int): Input
+}
+
+' Concrete Aggregators
+class MeanAggregator {
+    + name(): string
+    + aggregate(values: vector<double>): double
+}
+
+class MedianAggregator {
+    + name(): string
+    + aggregate(values: vector<double>): double
+}
+
+class MinAggregator {
+    + name(): string
+    + aggregate(values: vector<double>): double
+}
+
+class MaxAggregator {
+    + name(): string
+    + aggregate(values: vector<double>): double
+}
+
+' Simulation class
+class Simulation<Input, Output> {
+    - n_start: int
+    - n_end: int
+    - n_step: int
+    - repetitions: int
+    - inputGenerator: shared_ptr<IInputGenerator<Input>>
+    - simulator: shared_ptr<ISimulator<Input, Output>>
+    - metrics: vector<shared_ptr<IMetric<Output>>>
+    - rawResults: map<int, vector<Output>>
+    
+    + set_input_generator(gen: shared_ptr<IInputGenerator<Input>>): void
+    + set_simulator(sim: shared_ptr<ISimulator<Input, Output>>): void
+    + set_range(start: int, end: int, step: int): void
+    + set_repetitions(reps: int): void
+    + add_metric(metric: shared_ptr<IMetric<Output>>): void
+    + run(): void
+    + get_results(): map<string, map<int, double>>
+}
+
+' Relationships
+IAggregator <|-- MeanAggregator
+IAggregator <|-- MedianAggregator
+IAggregator <|-- MinAggregator
+IAggregator <|-- MaxAggregator
+
+IMetric *-- IAggregator : aggregator()
+
+Simulation o-- IInputGenerator : inputGenerator
+Simulation o-- ISimulator : simulator
+Simulation o-- IMetric : metrics
+
+note right of Simulation::rawResults
+    Stores results for each input size (n)
+    before aggregation by metrics
+end note
+
+@enduml

@@ -1,0 +1,30 @@
+cmake_minimum_required(VERSION 3.10)
+
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_C_STANDARD_REQUIRED TRUE)
+
+# Enable verbose output during the build process
+set(CMAKE_VERBOSE_MAKEFILE ON)
+
+# Enable all warnings and treat them as errors
+add_compile_options(-std=c++20 -Wall -Wextra -Werror -pedantic -g)
+
+# Enable clang-tidy checks
+set(CMAKE_CXX_CLANG_TIDY clang-tidy
+    "-checks=performance-*,readability-*,modernize-*,clang-analyzer-*,-header-filter=.*")
+
+# Set the output directory for all executables
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+
+# Include the header files directory
+include_directories(${PROJECT_SOURCE_DIR}/src/include)
+
+
+# Gather all .cpp files in the src/main folder
+file(GLOB MAIN_SOURCES ${PROJECT_SOURCE_DIR}/src/main/*.cpp)
+
+# Add an executable for each .cpp file
+foreach(SOURCE_FILE ${MAIN_SOURCES})
+    get_filename_component(EXECUTABLE_NAME ${SOURCE_FILE} NAME_WE)
+    add_executable(${EXECUTABLE_NAME} ${SOURCE_FILE})
+endforeach()
