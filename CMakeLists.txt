@@ -1,16 +1,21 @@
 cmake_minimum_required(VERSION 3.16)
-project(SimulationFramework)
+project(SimulationFramework LANGUAGES CXX)
 
 option(SIMULATIONFRAMEWORK_ENABLE_INSTALL "Enable install targets" ON)
 
 set(CMAKE_CXX_STANDARD 17)
 
+# Create the interface library
 add_library(SimulationFramework INTERFACE)
+add_library(simframework::SimulationFramework ALIAS SimulationFramework)
+
+# Include path
 target_include_directories(SimulationFramework INTERFACE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>
 )
 
+# Optional: Installation support
 if(SIMULATIONFRAMEWORK_ENABLE_INSTALL)
     include(GNUInstallDirs)
 
