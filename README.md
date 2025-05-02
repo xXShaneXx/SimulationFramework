@@ -113,12 +113,6 @@ int main() {
 }
 ```
 
-## License
-
-(Choose a license, e.g., MIT License)
-
----
-
 ## Notes
 
 * The framework is currently header-only, so no separate compilation is required.
