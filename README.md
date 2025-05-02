@@ -94,21 +94,87 @@ target_link_libraries(YourExecutable PUBLIC simframework::SimulationFramework)
 ## Example
 
 ```cpp
-#include <simframework/simulation.hpp>
-#include <simframework/interfaces.hpp>
 #include <iostream>
+#include <vector>
+#include <memory>
+#include <simframework/interfaces.hpp>
+#include <simframework/simulation.hpp>
 
-struct MySystem : public simfw::ISystem {
-    void update(double dt) override {
-        std::cout << "System updated with dt = " << dt << "\n";
+
+using namespace simframework;
+// Input type
+struct TestInput {
+    std::vector<double> values;
+};
+
+// Output type
+struct TestOutput {
+    double result;
+};
+
+// Input generator
+class TestInputGenerator : public IInputGenerator<TestInput> {
+public:
+    TestInput generate(int size) const override {
+        TestInput input;
+        for (int i = 0; i < size; ++i) {
+            input.values.push_back(static_cast<double>(rand()) / RAND_MAX);
+        }
+        return input;
+    }
+};
+
+// Simulator
+class TestSimulator : public ISimulator<TestInput, TestOutput> {
+public:
+    TestOutput operator()(const TestInput& input) const override {
+        TestOutput output;
+        output.result = std::accumulate(input.values.begin(), input.values.end(), 0.0);
+        return output;
+    }
+};
+
+// Sum metric
+class SumMetric : public IMetric<TestOutput> {
+public:
+    std::string name() const override { return "sum"; }
+    double extract(const TestOutput& output) const override {
+        return output.result;
     }
 };
 
 int main() {
-    simfw::Simulation sim;
-    sim.addSystem(std::make_shared<MySystem>());
+    // Create a simulation builder
+    auto builder = Simulation<TestInput, TestOutput>::create()
+        .set_range(10, 50, 10)  // From size 10 to 50 in steps of 10
+        .set_repetitions(3)     // 3 repetitions per size
+        .set_input_generator(std::make_shared<TestInputGenerator>())
+        .set_simulator(std::make_shared<TestSimulator>())
+        .add_metric(std::make_shared<SumMetric>(), std::make_shared<MeanAggregator>());
 
-    sim.update(0.1);
+    // Build and run the simulation
+    auto simulation = builder.build();
+    simulation->run();
+
+    // Get and print results with different aggregators
+    std::cout << "Results with Mean aggregation:\n";
+    auto mean_results = simulation->get_results(std::make_shared<MeanAggregator>());
+    for (const auto& [metric, values] : mean_results) {
+        std::cout << "Metric: " << metric << "\n";
+        for (const auto& [size, value] : values) {
+            std::cout << "  Size " << size << ": " << value << "\n";
+        }
+    }
+
+    std::cout << "\nResults with Max aggregation:\n";
+    auto max_results = simulation->get_results(std::make_shared<MaxAggregator>());
+    for (const auto& [metric, values] : max_results) {
+        std::cout << "Metric: " << metric << "\n";
+        for (const auto& [size, value] : values) {
+            std::cout << "  Size " << size << ": " << value << "\n";
+        }
+    }
+
     return 0;
 }
 ```
