@@ -20,7 +20,7 @@ A lightweight and flexible C++ framework for building simulations.
 
 ```bash
 # Clone your project repository
-git clone <your-repository-url>
+git clone https://github.com/xXShaneXx/SimulationFramework simulationframework
 cd SimulationFramework
 ```
 
@@ -76,7 +76,14 @@ add_subdirectory(simulationframework)
 
 # Link to your executable
 add_executable(YourExecutable main.cpp)
-target_link_libraries(YourExecutable PRIVATE simframework::SimulationFramework)
+target_link_libraries(YourExecutable PUBLIC simframework::SimulationFramework)
+```
+
+3. Include the headers in your source files:
+
+```cpp
+#include <simframework/simulation.hpp>
+#include <simframework/interfaces.hpp>
 ```
 
 ✅ No install step is needed.
@@ -87,8 +94,8 @@ target_link_libraries(YourExecutable PRIVATE simframework::SimulationFramework)
 ## Example
 
 ```cpp
-#include <simulation.hpp>
-#include <interfaces.hpp>
+#include <simframework/simulation.hpp>
+#include <simframework/interfaces.hpp>
 #include <iostream>
 
 struct MySystem : public simfw::ISystem {
@@ -105,11 +112,6 @@ int main() {
     return 0;
 }
 ```
-
-## Structure
-
-* `include/interfaces.hpp` : Defines `ISystem` and `ISimulation` interfaces.
-* `include/simulation.hpp` : Provides the `Simulation` class managing multiple systems.
 
 ## License
 
