@@ -66,5 +66,6 @@ coverage/
 .hypothesis/
 
 # Ignore all build directories
+src/
 build/
 dist/
