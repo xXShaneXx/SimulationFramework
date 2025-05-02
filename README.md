@@ -1,32 +1,128 @@
 # SimulationFramework
 
-SimulationFramework is a lightweight, flexible, and extensible C++ framework for running simulations. It provides a modular design that allows users to define custom input generators, simulators, metrics, and aggregators to analyze simulation results.
+A lightweight and flexible C++ framework for building simulations.
 
 ## Features
 
-- **Modular Design**: Easily extend the framework by implementing interfaces for input generation, simulation, metrics, and aggregation.
-- **Builder Pattern**: Simplifies the creation and configuration of simulations.
-- **Header-Only Library**: No need for additional compilation; just include the headers.
-- **Custom Metrics and Aggregators**: Define your own metrics and aggregation strategies for analyzing simulation results.
-- **Multiple Aggregation Methods**: Built-in support for mean, median, min, and max aggregations.
+* Interface-based architecture (`ISystem`, `ISimulation`) for modular design.
+* Header-only library.
+* Easy integration using CMake.
+* Supports installation via CMake.
 
-## Getting Started
+## Requirements
 
-### Prerequisites
+* CMake >= 3.16
+* C++17 compatible compiler (e.g., GCC 9+, Clang 10+, MSVC 2019+)
 
-- C++17 or later
-- [CMake](https://cmake.org/) 3.16 or later (optional, for installation)
-- [GoogleTest](https://github.com/google/googletest) (for testing)
+## Building and Installing
 
-### Installation
+### 1. Clone the Repository
 
-#### Option 1: Header-only usage
-Simply include the `include/` directory in your project's include path.
-
-#### Option 2: System-wide installation
 ```bash
-git clone https://github.com/your-username/SimulationFramework.git
+# Clone your project repository
+git clone <your-repository-url>
 cd SimulationFramework
+```
+
+### 2. Build and Install (Optional)
+
+```bash
+# Create a build directory
 mkdir build && cd build
-cmake -DSIMULATIONFRAMEWORK_ENABLE_INSTALL=ON ..
-cmake --install .
+
+# Configure with CMake
+cmake .. -DCMAKE_INSTALL_PREFIX=/your/install/path
+
+# Install
+cmake --build . --target install
+```
+
+The framework will be installed to `/your/install/path`.
+
+## Usage
+
+### 1. Install and Find Package
+
+If you installed SimulationFramework, in your `CMakeLists.txt`:
+
+```cmake
+find_package(SimulationFramework REQUIRED)
+
+add_executable(YourExecutable main.cpp)
+target_link_libraries(YourExecutable PRIVATE simframework::SimulationFramework)
+```
+
+Make sure to add the appropriate `CMAKE_PREFIX_PATH` if the framework is installed in a non-standard location:
+
+```bash
+cmake -DCMAKE_PREFIX_PATH=/your/install/path ..
+```
+
+### 2. Add as Subdirectory (No Install Needed)
+
+Alternatively, you can directly add the framework into your project without installing:
+
+1. Clone SimulationFramework into your project:
+
+```bash
+git clone <your-repo-url> simulationframework
+```
+
+2. Modify your `CMakeLists.txt`:
+
+```cmake
+# Add the SimulationFramework folder
+add_subdirectory(simulationframework)
+
+# Link to your executable
+add_executable(YourExecutable main.cpp)
+target_link_libraries(YourExecutable PRIVATE simframework::SimulationFramework)
+```
+
+✅ No install step is needed.
+✅ No `find_package()` needed.
+
+---
+
+## Example
+
+```cpp
+#include <simulation.hpp>
+#include <interfaces.hpp>
+#include <iostream>
+
+struct MySystem : public simfw::ISystem {
+    void update(double dt) override {
+        std::cout << "System updated with dt = " << dt << "\n";
+    }
+};
+
+int main() {
+    simfw::Simulation sim;
+    sim.addSystem(std::make_shared<MySystem>());
+
+    sim.update(0.1);
+    return 0;
+}
+```
+
+## Structure
+
+* `include/interfaces.hpp` : Defines `ISystem` and `ISimulation` interfaces.
+* `include/simulation.hpp` : Provides the `Simulation` class managing multiple systems.
+
+## License
+
+(Choose a license, e.g., MIT License)
+
+---
+
+## Notes
+
+* The framework is currently header-only, so no separate compilation is required.
+* You can disable installation by setting `SIMULATIONFRAMEWORK_ENABLE_INSTALL=OFF` when configuring with CMake.
+
+---
+
+Happy simulating!
+
