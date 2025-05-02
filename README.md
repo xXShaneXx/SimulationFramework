@@ -58,7 +58,7 @@ Make sure to add the appropriate `CMAKE_PREFIX_PATH` if the framework is install
 cmake -DCMAKE_PREFIX_PATH=/your/install/path ..
 ```
 
-### 2. Add as Subdirectory (No Install Needed)
+### 2. Add as Subdirectory (Optional)
 
 Alternatively, you can directly add the framework into your project without installing:
 
